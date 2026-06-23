@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>日常食記 - 我的極簡食譜小工具</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* 注入日系雜誌核心字體與細節 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fbfbfa; /* 日系暖白/米色調 */
+            color: #2b2b2a;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .serif-title {
+            font-family: 'Noto Serif TC', serif;
+        }
+        /* 隱藏滾動條但保留功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <header class="px-6 pt-8 pb-4 bg-[#fbfbfa] sticky top-0 z-40 border-b border-[#e6e5e0]">
+        <div class="flex justify-between items-baseline">
+            <h1 class="serif-title text-2xl font-bold tracking-wide text-[#1c1c1b]">日常食記</h1>
+            <span class="text-xs tracking-widest text-gray-400 uppercase" id="current-season">SUMMER / 當季推薦</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">珍藏媽媽的手藝與廚房的隨筆記錄</p>
+    </header>
+
+    <main class="max-w-md mx-auto px-5 pt-4" id="recipe-container">
+        </main>
+
+    <button onclick="openAddModal()" class="fixed right-6 bottom-24 bg-[#4a5e4e] text-white p-4 rounded-full shadow-lg hover:bg-[#3b4c3e] transition-colors z-50 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+    </button>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[#e6e5e0] z-40 shadow-sm">
+        <div class="max-w-md mx-auto flex justify-between px-2 overflow-x-auto no-scrollbar">
+            <button onclick="filterCategory('全部')" class="nav-item px-4 py-4 text-sm font-medium text-[#4a5e4e] border-b-2 border-[#4a5e4e] whitespace-nowrap" id="tab-全部">全部</button>
+            <button onclick="filterCategory('雞蛋')" class="nav-item px-4 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent whitespace-nowrap" id="tab-雞蛋">雞蛋</button>
+            <button onclick="filterCategory('魚與海鮮')" class="nav-item px-4 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent whitespace-nowrap" id="tab-魚與海鮮">魚與海鮮</button>
+            <button onclick="filterCategory('蔬菜')" class="nav-item px-4 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent whitespace-nowrap" id="tab-蔬菜">蔬菜</button>
+            <button onclick="filterCategory('雞肉')" class="nav-item px-4 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent whitespace-nowrap" id="tab-雞肉">雞肉</button>
+            <button onclick="filterCategory('牛肉')" class="nav-item px-4 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent whitespace-nowrap" id="tab-牛肉">牛肉</button>
+            <button onclick="filterCategory('豬肉')" class="nav-item px-4 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent whitespace-nowrap" id="tab-豬肉">豬肉</button>
+        </div>
+    </nav>
+
+    <div id="add-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-end justify-center">
+        <div class="bg-white w-full max-w-md rounded-t-2xl p-6 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="serif-title text-lg font-bold text-[#1c1c1b]">記錄新菜色</h3>
+                <button onclick="closeAddModal()" class="text-gray-400 p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <form id="recipe-form" onsubmit="saveRecipe(event)" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">菜色名稱</label>
+                    <input type="text" id="form-title" required class="w-full bg-[#f7f6f3] border-0 rounded-lg p-3 focus:ring-1 focus:ring-[#4a5e4e] outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">食材分類</label>
+                    <select id="form-category" class="w-full bg-[#f7f6f3] border-0 rounded-lg p-3 focus:ring-1 focus:ring-[#4a5e4e] outline-none">
+                        <option value="雞蛋">雞蛋</option>
+                        <option value="魚與海鮮">魚與海鮮</option>
+                        <option value="蔬菜">蔬菜</option>
+                        <option value="雞肉">雞肉</option>
+                        <option value="牛肉">牛肉</option>
+                        <option value="豬肉">豬肉</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">時令碎念 / 備註</label>
+                    <input type="text" id="form-note" class="w-full bg-[#f7f6f3] border-0 rounded-lg p-3 focus:ring-1 focus:ring-[#4a5e4e] outline-none" placeholder="例如：大黃瓜產季從三月開始...">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">材料清單 (換行分隔)</label>
+                    <textarea id="form-ingredients" rows="3" required class="w-full bg-[#f7f6f3] border-0 rounded-lg p-3 focus:ring-1 focus:ring-[#4a5e4e] outline-none" placeholder="豬五花片 150g&#10;洋蔥 半顆"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">做法步驟 (換行分隔)</label>
+                    <textarea id="form-steps" rows="4" required class="w-full bg-[#f7f6f3] border-0 rounded-lg p-3 focus:ring-1 focus:ring-[#4a5e4e] outline-none" placeholder="1. 洋蔥切絲炒軟&#10;2. 加入肉片翻炒"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">新增相片</label>
+                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors relative">
+                        <input type="file" id="form-image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(event)">
+                        <div id="image-preview-placeholder" class="text-gray-400 space-y-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V3z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span class="text-xs block">點擊拍攝或上傳美麗的料理照</span>
+                        </div>
+                        <img id="image-preview" class="hidden max-h-40 mx-auto rounded-lg shadow-sm">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#4a5e4e] text-white py-3 rounded-lg font-medium hover:bg-[#3b4c3e] transition-colors mt-2">完成記錄</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 初始食譜數據庫（完全保留妳的 Word 中文語感細節）
+        let recipes = [
+            {
+                id: 1,
+                title: "薑燒豬肉丼",
+                category: "豬肉",
+                season: "夏",
+                note: "日本大眾食堂與家庭料理的定番。如果不做成丼飯，配上大量的高麗菜絲一起吃也別有風味。",
+                ingredients: ["豬五花片 150g", "洋蔥 半顆，切絲", "薑泥 一大匙", "青椒 1/4顆", "醬油 20ml", "味淋 10ml", "料理酒 10ml"],
+                steps: ["將薑泥、醬油、味淋與料理酒混合好備用。", "在鍋中炒洋蔥，炒軟後放入五花肉片，快速拌散。", "待肉片半熟左右，加入青椒一起翻炒，並倒入剛才調好的醬汁。", "確定所有肉片都熟了，稍微收汁即可盛起，配上兩片番茄增色。"],
+                image: ""
+            },
+            {
+                id: 2,
+                title: "大黃瓜蛤蜊雞湯",
+                category: "雞肉",
+                season: "夏",
+                note: "大黃瓜產季從三月多開始，一直到夏天，我喜歡它的清甜。就算是煮湯，也不煮太久以免過軟沒口感。",
+                ingredients: ["大黃瓜 1/3根", "蛤蜊 300g", "帶骨雞肉 5-6塊", "乾香菇 4-5朵", "昆布 5x5兩片", "鹽 少許"],
+                steps: ["大黃瓜去籽切塊，雞肉滾水燙過沖淨，乾香菇與昆布泡冷水至少一小時。", "在鍋中放入香菇、昆布和泡過它們的水，煮滾後放入雞肉塊。", "再次煮滾後仔細撈除浮泡，加少許鹽調味，小火繼續燉煮。", "起鍋前加入大黃瓜與蛤蜊，煮至蛤蜊全開即可。"],
+                image: ""
+            },
+            {
+                id: 3,
+                title: "魚露檸檬牛肉河粉 (媽媽版)",
+                category: "牛肉",
+                season: "夏",
+                note: "來自媽媽親傳的暖心味道，充滿魚露的鮮與鮮檸檬的爽口。",
+                ingredients: ["牛肉片 150g", "河粉 1人份", "九層塔 適量", "鮮檸檬 1/4顆", "魚露 1.5大匙", "高湯 1碗"],
+                steps: ["將河粉依包裝說明煮熟，撈起置於碗中備用。", "煮滾高湯，放入牛肉片快速涮熟，保持肉質嫩度。", "將牛肉片與湯頭倒入河粉碗中。", "擠入鮮檸檬汁，淋上魚露，最後抓上一把九層塔提香。"],
+                image: ""
+            }
+        ];
+
+        let currentCategory = '全部';
+        let uploadedImageBase64 = "";
+
+        // 動態根據當前月份顯示雜誌推薦語
+        function updateSeasonText() {
+            const month = new Date().getMonth() + 1;
+            const seasonEl = document.getElementById('current-season');
+            if (month >= 3 && month <= 5) seasonEl.innerText = "SPRING / 春日旬味推薦";
+            else if (month >= 6 && month <= 8) seasonEl.innerText = "SUMMER / 夏日清爽提案";
+            else if (month >= 9 && month <= 11) seasonEl.innerText = "AUTUMN / 秋日豐收滋味";
+            else seasonEl.innerText = "WINTER / 冬日暖心推薦";
+        }
+
+        // 渲染食譜卡片邏輯
+        function renderRecipes() {
+            const container = document.getElementById('recipe-container');
+            container.innerHTML = "";
+
+            const filtered = currentCategory === '全部' 
+                ? recipes 
+                : recipes.filter(r => r.category === currentCategory);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-20 text-gray-400 text-sm">
+                        <p>這格分類目前空空的</p>
+                        <p class="text-xs mt-1">點擊右下角加上妳或媽媽的新菜色吧！</p>
+                    </div>`;
+                return;
+            }
+
+            filtered.forEach(recipe => {
+                // 處理相片欄位：若無相片則顯示極簡雜誌圖示預留
+                const imageSection = recipe.image 
+                    ? `<div class="w-full h-48 bg-gray-100 rounded-xl mb-4 overflow-hidden shadow-sm">
+                        <img src="${recipe.image}" class="w-full h-full object-cover">
+                       </div>`
+                    : `<div class="w-full h-32 bg-[#f4f3ef] rounded-xl mb-4 flex flex-col items-center justify-center border border-[#e6e5e0] text-gray-400 space-y-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 stroke-[1.2]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V3z"/></svg>
+                        <span class="text-[10px] tracking-wider">靜待料理上桌後補拍</span>
+                       </div>`;
+
+                const ingredientsHtml = recipe.ingredients.map(i => `<span class="inline-block bg-[#f4f3ef] text-gray-600 px-2.5 py-1 rounded text-xs mr-1.5 mb-1.5">${i}</span>`).join('');
+                const stepsHtml = recipe.steps.map((s, idx) => `<div class="flex items-start text-sm leading-relaxed text-[#444340] mb-2"><span class="text-[#4a5e4e] font-bold mr-2 text-xs pt-0.5">${idx+1}.</span><p class="flex-1">${s}</p></div>`).join('');
+
+                const card = document.createElement('article');
+                card.className = "bg-white rounded-2xl p-5 mb-6 border border-[#e6e5e0] shadow-sm tracking-wide transition-all";
+                card.innerHTML = `
+                    ${imageSection}
+                    <div class="flex justify-between items-baseline mb-1">
+                        <h2 class="serif-title text-xl font-bold text-[#1c1c1b]">${recipe.title}</h2>
+                        <span class="text-[11px] text-[#4a5e4e] bg-[#eef3ef] px-2 py-0.5 rounded-full font-medium">${recipe.category}</span>
+                    </div>
+                    ${recipe.note ? `<p class="text-xs text-gray-400 italic mb-4 leading-relaxed">「 ${recipe.note} 」</p>` : '<div class="mb-3"></div>'}
+                    
+                    <div class="mb-4">
+                        <h4 class="text-[11px] font-bold tracking-wider text-gray-400 uppercase mb-2">✦ 材料備妥</h4>
+                        <div class="flex flex-wrap">${ingredientsHtml}</div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-[11px] font-bold tracking-wider text-gray-400 uppercase mb-2">✦ 烹調步驟</h4>
+                        <div>${stepsHtml}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 分類切換邏輯
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('text-[#4a5e4e]', 'border-[#4a5e4e]');
+                el.classList.add('text-gray-400', 'border-transparent');
+            });
+            const activeTab = document.getElementById(`tab-${cat}`);
+            activeTab.classList.remove('text-gray-400', 'border-transparent');
+            activeTab.classList.add('text-[#4a5e4e]', 'border-[#4a5e4e]');
+            renderRecipes();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Modal 視窗開關
+        function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
+        function closeAddModal() { 
+            document.getElementById('add-modal').classList.add('hidden'); 
+            document.getElementById('recipe-form').reset();
+            document.getElementById('image-preview').classList.add('hidden');
+            document.getElementById('image-preview-placeholder').classList.remove('hidden');
+            uploadedImageBase64 = "";
+        }
+
+        // 相片即時預覽與 Base64 轉換（完美解決手機拍照儲存問題）
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImageBase64 = e.target.result;
+                    document.getElementById('image-preview').src = uploadedImageBase64;
+                    document.getElementById('image-preview').classList.remove('hidden');
+                    document.getElementById('image-preview-placeholder').classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 儲存新食譜到本地陣列並刷新畫面
+        function saveRecipe(event) {
+            event.preventDefault();
+            const title = document.getElementById('form-title').value;
+            const category = document.getElementById('form-category').value;
+            const note = document.getElementById('form-note').value;
+            const ingredients = document.getElementById('form-ingredients').value.split('\n').filter(i => i.trim() !== '');
+            const steps = document.getElementById('form-steps').value.split('\n').filter(s => s.trim() !== '');
+
+            const newRecipe = {
+                id: recipes.length + 1,
+                title,
+                category,
+                season: "夏",
+                note,
+                ingredients,
+                steps,
+                image: uploadedImageBase64
+            };
+
+            recipes.unshift(newRecipe); // 將新菜色排在最前面
+            closeAddModal();
+            filterCategory(category); // 自動切換到該分類查看新菜色
+        }
+
+        // 程式初始化
+        updateSeasonText();
+        renderRecipes();
+    </script>
+</body>
+</html>
