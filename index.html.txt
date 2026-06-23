@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日系雜誌風日常食譜庫</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #faf9f6;
+            --text-color: #2b2b2b;
+            --muted-color: #7a7a7a;
+            --border-color: #e3e1da;
+            --accent-color: #8c7e6c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            padding: 0 20px;
+        }
+
+        header {
+            max-width: 800px;
+            margin: 60px auto 40px auto;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+        }
+
+        header h1 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: var(--muted-color);
+            letter-spacing: 1px;
+        }
+
+        /* 導覽與搜尋區塊 */
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            position: sticky;
+            top: 0;
+            background-color: rgba(250, 249, 246, 0.95);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            border-radius: 0;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent-color);
+        }
+
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1rem;
+            color: var(--muted-color);
+            cursor: pointer;
+            padding: 5px 10px;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            color: var(--text-color);
+            font-weight: 700;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+
+        /* 食譜目錄跳轉列表 */
+        .recipe-menu-section {
+            max-width: 800px;
+            margin: 0 auto 60px auto;
+        }
+
+        .recipe-menu-section h2 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            text-align: center;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .menu-item:hover {
+            border-color: var(--accent-color);
+            background-color: #fcfbfa;
+            transform: translateY(-2px);
+        }
+
+        /* 食譜內文詳細區塊 */
+        main {
+            max-width: 800px;
+            margin: 0 auto 100px auto;
+        }
+
+        .recipe-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            margin-bottom: 60px;
+            scroll-margin-top: 120px; /* 避免跳轉時被上方固定的導覽列擋住 */
+        }
+
+        .recipe-card h2 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .recipe-card .category-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 2px 8px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .recipe-card .description {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .recipe-meta {
+            margin-bottom: 30px;
+        }
+
+        .recipe-meta h3 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .recipe-meta ul {
+            list-style-type: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px 20px;
+            font-size: 0.95rem;
+        }
+
+        .recipe-meta li {
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .recipe-steps h3 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        .recipe-steps ol {
+            padding-left: 20px;
+            font-size: 0.95rem;
+        }
+
+        .recipe-steps li {
+            margin-bottom: 12px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--muted-color);
+            padding: 40px 0;
+            border-top: 1px solid var(--border-color);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 600px) {
+            .recipe-card {
+                padding: 25px;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>KITCHEN JOURNAL</h1>
+        <p>日式靜謐風格 ‧ 乾淨清爽的日常食譜庫</p>
+    </header>
+
+    <div class="nav-container">
+        <input type="text" id="searchBox" class="search-box" placeholder="輸入關鍵字搜尋食譜... (例如：蝦、沙拉、冷麵)">
+        <div class="category-tabs">
+            <button class="tab-btn active" onclick="filterCategory('ALL', this)">全部 ALL</button>
+            <button class="tab-btn" onclick="filterCategory('米麵主食', this)">米麵主食</button>
+            <button class="tab-btn" onclick="filterCategory('肉類料理', this)">肉類料理</button>
+            <button class="tab-btn" onclick="filterCategory('海鮮水產', this)">海鮮水產</button>
+            <button class="tab-btn" onclick="filterCategory('湯品、沙拉與飲品', this)">湯品與沙拉</button>
+        </div>
+    </div>
+
+    <section class="recipe-menu-section">
+        <h2>— 快速跳轉目錄 —</h2>
+        <div class="menu-grid" id="menuGrid"></div>
+    </section>
+
+    <main id="recipeContainer"></main>
+
+    <footer>
+        <p>© Designed for Jenny's Daily Recipes. Clean & Minimal Style.</p>
+    </footer>
+
+    <script>
+        // 完整打包的 40 道食譜資料庫
+        const recipes = [
+            {
+                id: "recipe-1",
+                title: "竹筍炊飯",
+                category: "米麵主食",
+                desc: "竹筍飯可以用日式高湯煮，如果你的筍是用水煮過的，也可以用煮過的水來當高湯，會非常甘甜。材料可以只加竹筍，也可以加點其他的蔬菜，比如香菇，但不要放味道太強烈的食材，那就蓋過竹筍的味道了。",
+                ingredients: ["煮熟綠竹筍 兩支", "香菇 兩朵（可省略）", "米 兩杯", "昆布高湯或煮竹筍的水 兩杯", "淡味醬油 少許", "鹽 少許"],
+                steps: ["竹筍與香菇切片，在鍋中翻炒，以淡味醬油及鹽調味，所有材料都沾到醬味及油份即可熄火。", "將炒過的筍、菇與洗好的米放入煮飯鍋中，倒入高湯，放入電鍋烹煮即可。"]
+            },
+            {
+                id: "recipe-2",
+                title: "薑燒豬肉井",
+                category: "肉類料理",
+                desc: "薑燒豬肉應該是日本大眾食堂與家庭料理的定番，與馬鈴薯燉肉一樣，調味料的比例都可微調，薑味可濃可淡。配料只有洋蔥是一定要的，配上大量的高麗菜絲一起吃也別有風味。",
+                ingredients: ["豬五花片 150g", "洋蔥 半顆（切絲）", "薑泥 一大匙", "青椒 1/4顆（切長條片）", "醬油 20ml", "味淋 10ml", "料理酒 10ml", "水或日式高湯 15-20ml"],
+                steps: ["將薑泥、醬油、味淋與料理酒混合好備用。", "在鍋中炒洋蔥，炒軟後放入五花肉片快速拌散，待半熟左右，再加入青椒一起翻炒，並倒入調好的醬汁。", "若鍋中水分太少可補一點高湯，確定所有肉片都熟了，稍微收汁即可盛起，配上兩片番茄增色。"]
+            },
+            {
+                id: "recipe-3",
+                title: "柑橘蔬菜沙拉",
+                category: "湯品、沙拉與飲品",
+                desc: "可以用手邊有的任何生菜。柑橘類務必用當季當地的，剝皮切片備用，記得用上品質最好的初榨橄欖油，絕對會讓你的沙拉與眾不同。",
+                ingredients: ["喜歡的生菜 2-3種", "橘子 1顆", "橘子汁 少許", "檸檬 1/4顆", "小馬鈴薯 2顆", "乾麵包塊 少許", "初榨橄欖油 3大匙", "白酒醋或酸桔醋 半大匙", "鹽、黑胡椒 各少許"],
+                steps: ["生菜洗淨徹底脫水；橘子先切1/4下來擠汁，剩下的剝皮切片；檸檬切薄片；馬鈴薯去皮切大塊。", "煮一鍋滾水加鹽，把馬鈴薯放進去煮大約10-15分至鬆軟。", "調製醬汁：將橘子汁、檸檬汁、酒醋和橄欖油混合，加鹽與胡椒調味，仔細拌勻（味道要略鹹一點點）。", "馬鈴薯煮好後倒乾水，放涼5分鐘。將所有食材放進沙拉缽裡，倒入醬汁輕輕拌勻即可。"]
+            },
+            {
+                id: "recipe-4",
+                title: "大黃瓜蛤蜊雞湯",
+                category: "湯品、沙拉與飲品",
+                desc: "不同季節可以用任何蔬菜替換大黃瓜。大黃瓜的產季從三月多開始，我喜歡它的清甜，但就算是煮湯也不煮太久，以免過軟沒口感。",
+                ingredients: ["大黃瓜 1/3根", "蛤蜊 300g", "帶骨雞肉 5-6塊", "乾香菇 4-5朵", "昆布 2片", "鹽 少許"],
+                steps: ["大黃瓜去籽切塊，雞肉以滾水燙過並洗淨，乾香菇與昆布泡冷水至少一小時。", "鍋中放入香菇、昆布和泡香菇的水，煮滾後放入雞肉塊，再次煮滾後仔細撈乾淨浮泡與細渣。", "加少許鹽調味，以小火繼續煮15分鐘，放入大黃瓜再煮10分鐘，轉大火再次滾開，加入蛤蜊煮到開口，視情況補鹽。"]
+            },
+            {
+                id: "recipe-5",
+                title: "日式蔬菜冷麵",
+                category: "米麵主食",
+                desc: "這麼熱的夏天，最適合的就是這種冰涼食物了，配冷酒或啤酒也很不錯噢。沾麵露可以一次多做一點放冰箱，非常方便。",
+                ingredients: ["日式高湯 400ml", "醬油 1.5大匙", "味醂 1.5大匙", "素麵 一人份", "喜歡的蔬菜 2-3種", "紫蘇葉 1片", "溫泉蛋 1顆", "海苔絲 一小把"],
+                steps: ["將日式高湯、醬油、味醂點火熬煮，煮滾後放涼，進冰箱冷藏至少兩小時作為沾麵露。", "燒一鍋滾水川燙蔬菜（秋葵、玉米等需燙熟；番茄、小黃瓜可生食），切成適當大小，紫蘇切細絲。", "起一鍋水煮素麵，熟後撈起快速沖冷水，或泡進冰塊水中冰鎮降溫以保持Q彈。", "瀝乾水分盛盤，依序鋪上蔬菜、紫蘇末、溫泉蛋，吃之前再倒入冰涼的沾麵露與海苔絲。"]
+            },
+            {
+                id: "recipe-6",
+                title: "茄汁紅酒燉牛肉",
+                category: "肉類料理",
+                desc: "這道菜看上去材料很多，但其實真正核心的材料就只有牛肉、洋蔥、番茄罐頭與紅酒這四樣。雖然是家庭版，滋味卻有樸實的美味。",
+                ingredients: ["牛肋條 500g", "洋蔥 2顆（切絲）", "番茄罐頭 1罐", "番茄糊 2大匙", "喜歡的紅酒 200ml", "牛骨高湯或雞高湯 800-1000ml", "月桂葉 2片", "百里香 少許", "蘑菇、芹菜、胡蘿蔔 適量", "鹽、黑胡椒、醬油 適量"],
+                steps: ["牛肋條切塊均勻灑上鹽，其餘蔬菜切適口大小。高湯加熱備用。", "在大深鍋中炒洋蔥至軟化微黃，放入牛肉翻炒，再加入其餘蔬菜炒出香氣，以鹽、黑胡椒調味並加入月桂葉與百里香。", "倒入紅酒以大火將酒氣煮掉，加入番茄罐頭、番茄糊、熱高湯，煮滾後撈淨浮泡，加少許醬油提味。", "轉最小火慢燉90-100分鐘直到牛肉軟爛，或者用低溫烤箱慢烤。"]
+            },
+            {
+                id: "recipe-7",
+                title: "鮮蝦芒果莎莎味噌牛奶冷麵",
+                category: "米麵主食",
+                desc: "素麵的另一種吃法，以清爽的芒果莎莎醬，配溫熱的奶油煎蝦，加入冰的味噌牛奶湯，清爽無負擔。",
+                ingredients: ["日本素麵 1把", "鮮蝦 5隻", "奶油 5g", "芒果、番茄、洋蔥、小黃瓜 各適量（切丁）", "鮮乳 240ml", "昆布高湯 50ml", "白味噌 5g"],
+                steps: ["鮮蝦去頭去殼、開背去泥腸。將芒果、洋蔥、小番茄、小黃瓜切丁攪拌均勻成莎莎醬。", "昆布高湯加熱至微溫，放入白味噌拌至溶化，放涼後加入鮮乳拌勻成味噌牛奶湯。", "熱鍋轉最小火，放入奶油將鮮蝦煎熟，並將鍋中融化的奶油倒入莎莎醬中拌勻。", "煮滾水放入素麵煮1分鐘，撈起沖冰水瀝乾。麵放碗中，倒入味噌牛奶湯、冰塊，鋪上莎莎醬與煎蝦。"]
+            },
+            {
+                id: "recipe-8",
+                title: "檸檬香草蛤蜊",
+                category: "海鮮水產",
+                desc: "這道菜走清爽系，除了單吃，也可以拿麵包來沾湯汁，或是下一把義大利麵拌一拌，就是豐富的午餐了。",
+                ingredients: ["蛤蜊 500g", "大蒜 2瓣（切末）", "辣椒 1小截", "橄欖油 2大匙", "黃檸檬汁 半顆份", "昆布鰹魚高湯 50ml", "義大利香芹 一把（切末）", "鹽、黑胡椒 少許"],
+                steps: ["鍋中倒入橄欖油，放入蒜末與辣椒以小火慢慢加熱逼出蒜香，注意不要燒焦。", "香氣出來後放入蛤蜊轉大火快速拌炒，倒入高湯與檸檬汁，可加蓋加快蛤蜊開口速度。", "蛤蜊陸續開口後試味道，視需求補鹽，磨一點黑胡椒並撒上香芹末，熄火裝盤。"]
+            },
+            {
+                id: "recipe-9",
+                title: "斑比貓飯",
+                category: "米麵主食",
+                desc: "斑比式的貓飯，就是不論飯裡要拌柴魚還是魚罐頭都好，只要最後加一顆無敵半熟溫泉蛋，就真的無敵。",
+                ingredients: ["白飯 1碗", "柴魚 7克", "日式醬油 1-2湯匙", "雞蛋 1顆"],
+                steps: ["單柄鍋內燒滾水，轉成小火讓水只冒著微微泡泡。蛋敲開入鍋，邊旋轉鍋柄讓蛋不黏底，隨即熄火靜置5分鐘。", "白飯盛碗，鋪上柴魚，小心撈起半熟水波蛋放在正中央，淋上日式醬油即可。"]
+            },
+            {
+                id: "recipe-10",
+                title: "烏魚子芥蘭",
+                category: "海鮮水產",
+                desc: "鹽水清燙的芥蘭菜，在烏魚子細雪裡展現出豔麗的發酵香與日曬香，鹹甘到鮮味迸射，留下海潮繾綣的餘韻。",
+                ingredients: ["烏魚子 1小碗", "芥藍菜 1大把", "鹽 適量"],
+                steps: ["起一鍋熱水，加鹽到接近湯的鹹度，燒至滾沸。", "將芥蘭扳折到好入口的大小，入鍋攪拌開來，隨即熄火瀝出盛盤。", "烏魚子剝去外膜，直火烤至香酥，用起司刨板在芥蘭菜上大量刨上烏魚子，拌勻即可。"]
+            },
+            {
+                id: "recipe-11",
+                title: "蝦茸大豆苗",
+                category: "海鮮水產",
+                desc: "幼幼細細的蝦丁被柔香的大豆苗包圍，蝦的華美鮮味融進豆苗的枝葉中，帶來更有氣質的層次。",
+                ingredients: ["白蝦 4-5尾", "大豆苗 1大把", "烏魚子 少許（選配）", "米酒 少許", "鹽、油 適量"],
+                steps: ["白蝦去殼去腸泥切成1公分小丁；大豆苗洗淨摘好。", "起鍋加少許油，炒香蝦丁並加入少許鹽調味。", "將大豆苗拌入鍋中，蓋上鍋蓋小悶至香軟，起鍋前嗆入少許米酒，翻炒均勻即可。"]
+            },
+            {
+                id: "recipe-12",
+                title: "檸檬金桂冰茶",
+                category: "湯品、沙拉與飲品",
+                desc: "檸檬冰茶是夏日聖品，融入了飄散桂花香氣的檸檬金桂果醬，既優雅又消暑！",
+                ingredients: ["紅茶包 3包", "水 1000ml", "黃檸檬汁 半顆份", "黃檸檬切片 半顆份", "蜂蜜 2大匙", "檸檬金桂果醬 3大匙"],
+                steps: ["燒開1000ml的水，投入紅茶包浸泡5分鐘，取出茶包後趁熱調入蜂蜜與果醬融化。", "將熱茶放涼後冰鎮一晚（若急用可減少初始水量並改加冰塊降溫）。", "茶降溫後，加入黃檸檬汁與黃檸檬切片拌勻即可。"]
+            },
+            {
+                id: "recipe-13",
+                title: "柑橘風味火腿起司熱烤三明治",
+                category: "肉類料理",
+                desc: "烤起司三明治是我的愛，夾入火腿是定番，再抹上帶有葡萄柚苦韻的琴湯尼果醬，風味更高級！",
+                ingredients: ["吐司麵包 2片", "奶油 10g", "熟火腿 1片", "艾曼塔或切達起司片 2片", "琴湯尼果醬 2大匙"],
+                steps: ["在2片吐司的單面塗上奶油，另一面塗上琴湯尼果醬。", "用中火加熱平底鍋，將塗奶油的那面朝下，烤到金黃酥脆後取出。", "取一片吐司（奶油面朝下、果醬面朝上），依序放上起司片與火腿片，蓋上另一片吐司（奶油面朝上）。", "放回小火平底鍋繼續烘烤，不時翻面直到起司完全融化。"]
+            },
+            {
+                id: "recipe-14",
+                title: "酪梨鮮蝦沙拉拌金牌柑橘醬汁",
+                category: "海鮮水產",
+                desc: "台灣酪梨產季和蝦仁一起做成沙拉，是很棒的開胃輕食。沙拉醬汁加入柑橘果醬、魚露與檸檬汁，香氣渾厚迷人。",
+                ingredients: ["酪梨 1個", "蝦仁 150g", "香菜 1束", "魚露 1大匙", "檸檬汁 2大匙", "橄欖油 2大匙", "柑橘果醬 1大匙"],
+                steps: ["酪梨放至完熟，剖半去籽剝皮，切成一口大小的塊狀。", "煮一鍋熱水將蝦仁燙至緊實變白，撈起立刻泡入冰水中冰鎮以維持彈性。", "香菜切碎末。將魚露、檸檬汁、橄欖油、柑橘果醬調勻成醬汁，與所有食材輕輕拌勻。"]
+            },
+            {
+                id: "recipe-15",
+                title: "吐司蝦",
+                category: "海鮮水產",
+                desc: "以半煎半炸的方式，用油量少，也比較簡便。將油爆入傾斜鍋子的炸法，非常輕省。",
+                ingredients: ["蝦仁 250g", "豬絞肉（偏肥） 100g", "厚切吐司 2-3片", "鹽、白胡椒、香油 少許", "青海苔粉 少許（選配）"],
+                steps: ["蝦子去殼去腸泥並擦乾。吐司去皮，對切再對切成四小塊。", "將3/4的蝦仁與豬絞肉放入處理機攪打至有黏性，加入鹽、胡椒、香油調味，再放入剩下1/4蝦仁略打保留口感。", "手沾少許水，將蝦肉漿鋪在吐司上堆高整型。", "平底鍋倒1cm高的油並傾斜鍋子，油溫夠後先煎蝦肉面，再翻面將每一面與接縫處都煎至金黃，起鍋灑海苔粉。"]
+            },
+            {
+                id: "recipe-16",
+                title: "茄汁牛肉丸",
+                category: "肉類料理",
+                desc: "牛絞肉肥瘦相間（七瘦三肥為佳）。搓丸子前先煮醬汁，煮到快滾再開始搓肉丸，每搓好一顆就直接下鍋才不易散開。",
+                ingredients: ["牛絞肉 200g", "洋蔥 半顆（切細丁）", "蛋黃 1個", "番茄紅醬罐頭 200ml", "高湯 200ml", "高湯醬油 1大匙", "鹽、黑胡椒、義式香料、帕梅善乳酪 適量"],
+                steps: ["洋蔥丁炒軟放涼。牛絞肉加鹽揉出黏性，分次加入30-40ml清水攪打進行「打水」，打至邊緣毛毛的。", "絞肉中加入洋蔥、蛋黃、香料、鹽、胡椒仔細拌勻。", "深鍋中放入番茄紅醬與高湯、醬油、香料煮滾，將肉餡搓成丸子狀直接投入醬汁中，以中小火慢煮。", "肉丸定型後再輕輕翻面燉煮5-6分鐘，上桌前撒上現磨乳酪、香芹與自製麵包丁。"]
+            },
+            {
+                id: "recipe-17",
+                title: "清炒蝦仁",
+                category: "海鮮水產",
+                desc: "蝦仁最好自己剝，盡量不要買現成的。兩面煎至上色即可，不要過度翻攪，以免蝦仁破散。",
+                ingredients: ["蝦仁 200g（去腸泥）", "蔥段 2枝份", "鹽、白胡椒、料理酒、麻油 少許", "淡味醬油 少許"],
+                steps: ["蝦仁與鹽、白胡椒、料酒及麻油拌勻，靜置10分鐘入味。", "熱鍋下油，鍋夠熱後將蝦仁一隻隻平擺入鍋先煎一面，待轉紅後再一隻隻翻面。", "兩面都上色後，淋上少許醬油快速炒幾下，投入蔥段翻炒一兩下即可起鍋。"]
+            },
+            {
+                id: "recipe-18",
+                title: "奶油蘑菇濃湯",
+                category: "湯品、沙拉與飲品",
+                desc: "菇種類不限，可以綜合幾種手邊有的菇類，再加入一些乾香菇，香氣會比較濃，泡菇的水也能當高湯使用。",
+                ingredients: ["蘑菇 2盒（切厚片）", "乾香菇 一小把（泡開切塊）", "洋蔥 1顆（切末）", "培根 100g（切丁）", "雞高湯 800ml", "鮮奶油 80-120ml", "泡香菇水 200ml", "奶油 15g", "麵粉 20g", "鹽、黑胡椒 適量"],
+                steps: ["熱鍋不放油，先將培根丁逼出香氣與油脂，放入洋蔥末炒至透明，再放入所有菇類炒軟，以鹽和胡椒調味。", "加入奶油使其融化，隨後撒入麵粉一起翻炒，讓蔬菜均勻包裹麵粉。", "倒入雞高湯與香菇水，大火煮滾並撈除浮泡，轉小火煮7-8分鐘。", "加入鮮奶油再煮1分鐘，依個人口味補足鹽與黑胡椒即可。"]
+            },
+            {
+                id: "recipe-19",
+                title: "希臘式烤魚",
+                category: "海鮮水產",
+                desc: "黑喉、紅喉、午仔魚都好，整尾的魚最好，像一夜干那樣剖開。回到家清洗乾淨並擦乾，最重要的是先預熱烤箱到220度。",
+                ingredients: ["鮮魚 一尾", "檸檬 半顆（榨汁）", "橄欖油 比檸檬汁略多", "粗海鹽 適量"],
+                steps: ["魚洗淨抹鹽靜置去腥，擦乾水分。烤箱預熱220度。", "將檸檬汁與橄欖油倒入小罐子中用力搖晃，使其乳化成淡黃色乳狀。", "將魚放在烤盤架上，撒上粗海鹽，澆上調好的檸檬橄欖油，送進烤箱最上層烤15分鐘至熟，出爐前可再淋少許油。"]
+            },
+            {
+                id: "recipe-20",
+                title: "清冰箱的義大利雜菜湯",
+                category: "湯品、沙拉與飲品",
+                desc: "這道湯的最大好處是，不必拘泥於食材，重點在於善用手邊現有的蔬菜，煮好後味道會融為一體，最好靜置一晚更美味。",
+                ingredients: ["洋蔥、胡蘿蔔、菇類、玉米筍 各適量（切小塊）", "皇帝豆、豌豆仁、白花椰菜 適量", "雞高湯與日式高湯 1000ml", "昆布 1片", "鹽、黑胡椒 適量"],
+                steps: ["深鍋熱鍋倒油，先炒香料蔬菜（如洋蔥），接著放入較硬的紅白蘿蔔翻炒，再加入菇類與豆類拌炒至沾附油份。", "倒入高湯與清水，放入昆布，煮滾後仔細撈乾淨浮泡與渣渣，加鹽和黑胡椒調味。", "轉小火慢煮30-40分鐘至蔬菜軟化，最後10分鐘加入不耐煮的白花椰菜，煮好後建議靜置一晚。"]
+            },
+            {
+                id: "recipe-21",
+                title: "湯咖哩",
+                category: "米麵主食",
+                desc: "含澱粉豐富的根莖類煎過再做咖哩特別美味，也不會弄糊一鍋湯。炒洋蔥是做一鍋好吃咖哩的馬步功夫。",
+                ingredients: ["去骨雞腿肉 2個", "各式蔬菜（南瓜、地瓜、馬鈴薯、秋葵、蓮藕等）", "洋蔥末、蒜末、薑末 適量", "綜合咖哩香料粉（或咖哩粉） 適量", "番茄糊 半罐", "黑巧克力塊 30g", "鹽、糖 適量"],
+                steps: ["雞腿肉皮朝下煎上色後切塊。原鍋倒滾水拌勻焦化油脂製成淡高湯。根莖類蔬菜切塊煎烤上色備用。", "另起鍋入油，有耐心地將洋蔥末、蒜末、薑末、糖炒至琥珀色，加入充足油量與香料粉以文火炒香。", "加入番茄糊充分翻炒，倒入淡高湯與滾水，放入雞腿肉、根莖類蔬菜與蓮藕燉煮。", "調入鹽、糖與黑巧克力塊調整風味與顏色，最後加入易熟蔬菜煮至軟化，搭配香料薑黃飯享用。"]
+            },
+            {
+                id: "recipe-22",
+                title: "雞肉蔬菜湯咖哩",
+                category: "米麵主食",
+                desc: "起於北海道札幌地區的和風洋食。最吸引人的是各色豐富的蔬菜，一次就可攝取多種顏色的營養，清爽甘甜！",
+                ingredients: ["去骨雞腿 2片", "洋蔥 半顆", "番茄 2顆", "南瓜、秋葵、蘑菇 適量", "日式純咖哩粉 適量", "椰奶、鹽、胡椒 少許"],
+                steps: ["去骨雞腿肉皮朝下入鍋，不放油雙面煎上色，取出切塊。蔬菜切同等大小。", "燉鍋下少許油，先將洋蔥炒至軟化透明，加入蘑菇及南瓜、番茄等其餘蔬菜稍微拌炒。", "加入咖哩粉、雞腿肉與清水（或椰子水）沒過食材，開火燉煮。", "煮至雞肉及蔬菜軟化後加入秋葵，可添加少許椰奶，並以鹽、胡椒調味。"]
+            },
+            {
+                id: "recipe-23",
+                title: "燉章魚佐香吉士沙拉",
+                category: "湯品、沙拉與飲品",
+                desc: "滷章魚比滷牛肉還要簡單，清燉開來的時候，湯色會自帶漂亮的櫻粉色，非常漂亮，自帶清雅飄揚的海味。",
+                ingredients: ["章魚 1-2隻（取章魚腳）", "香吉士或柳丁 1-2顆", "紫蘇葉 幾片", "香吉士或檸檬汁 少許"],
+                steps: ["章魚腳放入清水中清燉煮熟，撈出切成一口大小。", "香吉士去皮、去維管束後切丁；紫蘇葉切絲備用。", "將章魚腳、香吉士丁、紫蘇葉絲放入碗中，擠上一點香吉士或檸檬汁拌勻即可。"]
+            },
+            {
+                id: "recipe-24",
+                title: "土佐醋番茄",
+                category: "湯品、沙拉與飲品",
+                desc: "這個配方非常讓人驚豔，務必試試看。一定要用全熟的番茄，黑柿番茄比牛番茄更好，一定要去皮口感才好。",
+                ingredients: ["完熟番茄 2顆", "淡味醬油 20ml", "味醂 40ml", "米醋 40ml", "清水 120ml", "細切鰹魚片 5g"],
+                steps: ["將醬油、味醂、米醋、清水與鰹魚片倒入小鍋中，煮至滾沸後熄火，過濾掉鰹魚片放涼。", "番茄頂部劃十字燙熱水去皮，切成塊狀。", "將番茄塊完全浸泡入放涼的醬汁中，冷藏浸泡至少3-4小時（一晚最佳）即可享用。"]
+            },
+            {
+                id: "recipe-25",
+                title: "蝦仁燴豆腐",
+                category: "海鮮水產",
+                desc: "滑嫩、鮮爽，在微微悶熱的夏夜裡更容易入口。鮮蝦與豆腐在夏天注定要完美結合。",
+                ingredients: ["白蝦 12尾", "豆腐 1盒", "蔥花 少許", "鹽、白胡椒 適量"],
+                steps: ["白蝦去殼，留下蝦頭與蝦殼。蝦仁開背去腸泥。豆腐切成1.5公分大丁狀。", "乾鍋將蝦頭與蝦殼炒香至翻紅，注入一碗水略煮，熬出蝦湯後將殼撈起。", "將豆腐丁放入蝦湯中燒煮，撒入鹽與白胡椒煮至略微入味。", "水分快燒乾時可補少許水，煮滾後涮入蝦仁，待蝦仁表面翻紅，以餘溫悶熟，撒上蔥花起鍋。"]
+            },
+            {
+                id: "recipe-26",
+                title: "牡蠣奶油濃湯",
+                category: "湯品、沙拉與飲品",
+                desc: "這道濃湯是實實在在的 Comfort food，濃稠、厚底、飽足，充滿濃郁的海味與鮮甜。",
+                ingredients: ["新鮮牡蠣 200g", "奶油 20g", "麵粉 20g", "洋蔥碎 半顆份", "鮮乳 400ml", "鮮奶油 50ml", "鹽、白胡椒 適量"],
+                steps: ["牡蠣用鹽水洗淨瀝乾。洋蔥碎用奶油炒到質地軟化透明。", "加入麵粉小火拌炒均勻，慢慢分次倒入鮮乳攪拌均勻避免結塊。", "放入牡蠣以中小火煮滾，最後加入鮮奶油，以鹽及白胡椒調味即可。"]
+            },
+            {
+                id: "recipe-27",
+                title: "星期天的水餃 - 夏威夷水餃",
+                category: "肉類料理",
+                desc: "帶有熱帶風味的創意水餃，鳳梨的酸甜能完美中和豬肉的油膩，滋味新穎開胃。",
+                ingredients: ["豬絞肉 300g", "新鮮鳳梨丁 100g", "火腿丁 50g", "水餃皮 適量", "鹽、醬油、白胡椒粉 少許"],
+                steps: ["豬絞肉加入鹽、醬油順時針攪打至產生黏性。", "拌入切得很細的鳳梨丁與火腿丁，加入少許白胡椒粉調味均勻製成內餡。", "用水餃皮將餡料包裹好，入滾水中煮至全熟浮起即可。"]
+            },
+            {
+                id: "recipe-28",
+                title: "星期天的水餃 - 小松菜水餃",
+                category: "肉類料理",
+                desc: "清脆的小松菜非常適合做成餃子餡，帶有淡淡的清香，口感比高麗菜更為細緻。",
+                ingredients: ["豬絞肉 300g", "小松菜 200g", "薑末 1小匙", "水餃皮 適量", "鹽、香油、白胡椒 各少許"],
+                steps: ["小松菜洗淨入滾水快速川燙5秒，撈起泡冰水，用力擠乾水分後切成細末。", "豬絞肉加薑末、鹽、白胡椒粉與香油攪拌至有黏性。", "將小松菜末與肉餡混合拌勻，包入水餃皮中，投入滾水煮至熟透。"]
+            },
+            {
+                id: "recipe-29",
+                title: "魚露檸檬牛肉河粉 (貓男版)",
+                category: "米麵主食",
+                desc: "風味清爽卻極有深度的河粉，靈魂在於優質魚露與新鮮檸檬汁的完美酸鹹比例。",
+                ingredients: ["牛里肌薄片 150g", "河粉 一人份", "牛骨高湯 500ml", "魚露 1.5大匙", "檸檬汁 1大匙", "豆芽菜、九層塔、辣椒絲 適量"],
+                steps: ["河粉依包裝說明煮熟撈起置於碗中，鋪上生的牛肉薄片、豆芽菜與辣椒絲。", "牛骨高湯煮到大滾，調入魚露，直接將大滾的高湯沖入碗中將牛肉片燙至半熟。", "最後擠入新鮮檸檬汁，撒上九層塔即可享用。"]
+            },
+            {
+                id: "recipe-30",
+                title: "魚露檸檬牛肉河粉 (媽媽版)",
+                category: "米麵主食",
+                desc: "相較於貓男版，媽媽版的高湯加入了洋蔥與薑慢熬，風味更為溫潤家常，帶有淡淡的老薑甜味。",
+                ingredients: ["牛肉片 150g", "河粉 一人份", "牛高湯 500ml", "老薑 2片", "洋蔥 1/4顆", "魚露、檸檬汁、鹽 適量"],
+                steps: ["老薑片與洋蔥絲先在鍋中烤香，加入牛高湯慢火熬煮15分鐘後撈出香料，以魚露與鹽調味。", "河粉煮熟放入碗中，牛肉片先入高湯中涮至七分熟撈出鋪在河粉上。", "倒入滾燙的高湯，最後依個人喜好加入大量檸檬汁。"]
+            },
+            {
+                id: "recipe-31",
+                title: "日式漢堡排",
+                category: "肉類料理",
+                desc: "經典的日式洋食。絞肉必須充分拍打出空氣，煎的時候中間按壓微凹，才能鎖住滿滿的肉汁。",
+                ingredients: ["牛豬混合絞肉 300g", "洋蔥 半顆（切碎炒軟放涼）", "麵包粉 2大匙", "牛奶 1大匙", "雞蛋 1個", "鹽、黑胡椒、荳蔻粉 少許"],
+                steps: ["麵包粉先與牛奶混合。攪拌缽中放入絞肉與鹽，揉捏至產生黏性。", "加入洋蔥碎、蛋、麵包粉及調味料仔細揉勻。分成兩份，在兩手掌間來回摔打拍出空氣，整形成圓餅狀，中間用手指按壓出凹陷。", "熱鍋下油放入漢堡排，中火煎至底面金黃，翻面後倒入少許料理酒，蓋上鍋蓋小火蒸煎5分鐘至熟。"]
+            },
+            {
+                id: "recipe-32",
+                title: "蒸蛋湯",
+                category: "湯品、沙拉與飲品",
+                desc: "滑嫩如絲綢般的蒸蛋結合清淡的高湯，是一道溫柔溫暖、無負擔的家常湯品。",
+                ingredients: ["雞蛋 2顆", "日式高湯 300ml", "淡味醬油 1小匙", "味醂 半小匙", "蔥花 少許"],
+                steps: ["雞蛋輕輕打散（不要打出太多泡沫），加入日式高湯、醬油與味醂攪拌均勻。", "將蛋液用細網過濾一次，倒入耐熱湯碗中。", "電鍋外鍋放一杯水，鍋蓋留一小縫，蒸至定型熟透，出爐撒上蔥花。"]
+            },
+            {
+                id: "recipe-33",
+                title: "日式炸雞配鬆餅",
+                category: "肉類料理",
+                desc: "日式唐揚炸雞的酥脆多汁，搭配現烤格子鬆餅的甜香，鹹甜交織的絕妙美式和風組合。",
+                ingredients: ["去骨雞腿肉 250g", "醬油、料理酒、薑泥 各1大匙", "太白粉、麵粉 各適量", "現成鬆餅粉 100g", "鮮乳 80ml", "雞蛋 1顆"],
+                steps: ["雞肉切一口大小，用醬油、酒、薑泥醃製20分鐘。鬆餅粉加鮮乳與雞蛋拌勻，用鬆餅機烤好備用。", "將太白粉與麵粉以1:1混合，將醃好的雞肉均勻裹上一層薄粉，靜置微潮濕。", "入170度油鍋炸至金黃熟透，撈起後調高油溫大火逼油10秒。盤中擺上鬆餅與炸雞，可隨意搭配蜂蜜。"]
+            },
+            {
+                id: "recipe-34",
+                title: "家裡的蔥燒味 - 蝦仁飯",
+                category: "米麵主食",
+                desc: "帶有南部風味的古早味蔥燒蝦仁飯，米飯吸飽了蝦殼湯汁與紅蔥頭的香氣，濕潤美味。",
+                ingredients: ["新鮮白蝦 15尾", "白飯 2碗", "青蔥 3枝（切段）", "紅蔥頭 3瓣（切片）", "醬油 1.5大匙", "糖、白胡椒粉 少許"],
+                steps: ["白蝦去殼（留蝦殼熬湯）。蝦仁炒熟撈出。蝦殼入鍋加半碗水煮成濃郁蝦湯後過濾。", "起鍋爆香紅蔥頭與蔥段，倒入醬油、糖、白胡椒粉與蝦湯煮滾。", "放入白飯攪拌，讓米飯充分吸收湯汁至略微收乾，最後鋪上蝦仁即可。"]
+            },
+            {
+                id: "recipe-35",
+                title: "胡麻豬肉沙拉",
+                category: "湯品、沙拉與飲品",
+                desc: "夏日清爽的主食級沙拉，冰鎮過的豬五花片肥而不膩，搭配濃郁的日式胡麻醬非常開胃。",
+                ingredients: ["豬五花薄片 200g", "火鍋生菜或高麗菜絲 適量", "小黃瓜 1條（切絲）", "市售日式胡麻醬 3大匙", "料理酒 少許"],
+                steps: ["煮一鍋熱水加少許料理酒，將豬五花肉片入鍋涮熟，撈起立刻放入冰水中冰鎮，隨後瀝乾水分。", "盤中鋪上生菜與小黃瓜絲。", "放上冰鎮好的豬肉片，最後均勻淋上日式胡麻醬即可。"]
+            },
+            {
+                id: "recipe-36",
+                title: "奶油檸檬雞",
+                category: "肉類料理",
+                desc: "以鹽麴提供淡淡的鮮味，並取了清香帶皮的黃檸檬，透過酸味讓奶油更為清爽，起鍋前稍微拌炒，僅有恬淡的迷迭香氣。",
+                ingredients: ["雞大腿 2塊", "黃檸檬 半顆（切薄片）", "奶油 15g", "鹽麴 1大匙", "迷迭香 1枝", "白酒 少許"],
+                steps: ["雞大腿肉切塊，用鹽麴醃製15分鐘。熱鍋將雞肉皮朝下煎至表面金黃出油，翻面煎熟後取出。", "原鍋倒出多餘油脂，放入奶油融化，加入檸檬片與迷迭香小火炒出香氣，淋入少許白酒。", "將雞肉倒回鍋中快速拌炒，讓奶油檸檬醬汁均勻包裹雞肉即可熄火。"]
+            },
+            {
+                id: "recipe-37",
+                title: "薑汁燒肉",
+                category: "肉類料理",
+                desc: "炎炎夏日的清爽料理，快速簡單的懶人料理。使用薄切的豬五花肉很快就熟，顏色開始變時就可以加入醬汁煮了。",
+                ingredients: ["豬五花片 200g", "磨碎的薑 1小匙", "砂糖 1小匙", "酒 1大匙", "醬油 2大匙", "味醂 1大匙"],
+                steps: ["將豬五花肉切成易食用的大小，在平底鍋中快速炒熟。", "加入調好的調味料（薑、糖、酒、醬油、味醂），煮至湯汁收乾。", "將飯盛入碗中，依喜好將炒好的豬肉放在高麗菜上，即可完成！"]
+            },
+            {
+                id: "recipe-38",
+                title: "迷迭香風味烤雞肉和馬鈴薯",
+                category: "肉類料理",
+                desc: "風味高雅的烤箱料理。徹底清洗馬鈴薯保留皮。迷迭香不需用油逼出香氣會顯得香味太濃烈，高溫烘烤會散發恬淡的清香。",
+                ingredients: ["雞大腿 2塊", "馬鈴薯 2-3個", "迷迭香 3枝", "初榨橄欖油 50ml", "粗鹽 適量"],
+                steps: ["將雞肉切成一口大小的塊狀。馬鈴薯徹底清洗乾淨，保留外皮並切成塊狀。", "將雞肉塊、馬鈴薯塊放入烤盤中，均勻淋上初榨橄欖油，撒上充足的粗鹽，放上迷迭香枝葉。", "送入預熱至200度的烤箱中，烘烤大約25-30分鐘，直到馬鈴薯金黃鬆軟、雞肉表面酥脆。"]
+            },
+            {
+                id: "recipe-39",
+                title: "秘汁水波蛋",
+                category: "米麵主食",
+                desc: "看似簡單卻需要技巧的蛋料理。特製的浸泡特調祕汁讓水波蛋咬下時，濃郁醬香與滑順蛋黃在口中完美融合。",
+                ingredients: ["新鮮雞蛋 2顆", "醬油 2大匙", "味醂 1大匙", "高湯 2大匙", "白醋 1大匙（煮蛋用）"],
+                steps: ["小鍋中將醬油、味醂與高湯煮滾後熄火放涼，倒入容器中作為祕汁。", "另起一鍋水煮至微滾，加入白醋。用湯匙在水中攪出漩渦，將蛋打入漩渦中心，微火煮約3分鐘至蛋白凝固但蛋黃仍晃動。", "小心撈出水波蛋瀝乾，立刻放入冷開水中冷卻，隨後撈起移至祕汁中浸泡冷藏2小時以上即可。"]
+            },
+            {
+                id: "recipe-40",
+                title: "馬鈴薯燉肉",
+                category: "肉類料理",
+                desc: "日式家常料理的絕對經典。燉煮後隔夜再加熱，讓馬鈴薯與肉片完全吸收甜鹹醬汁，是最好吃的狀態。",
+                ingredients: ["豬肉片或牛肉片 200g", "馬鈴薯 2個（切塊）", "胡蘿蔔 1根（切塊）", "洋蔥 半顆（切塊）", "日式高湯 400ml", "醬油 3大匙", "味醂 2大匙", "砂糖 1大匙"],
+                steps: ["熱鍋下油，先將洋蔥塊炒至變軟，接著加入馬鈴薯與胡蘿蔔塊拌炒至表面稍微透明。", "倒入日式高湯、醬油、味醂與砂糖，大火煮滾後撈除表面浮沫。", "蓋上落蓋（或鋁箔紙）轉小火燉煮15分鐘，隨後加入肉片煮熟，繼續燜煮5分鐘直到湯汁略微收乾、食材入味。"]
+            }
+        ];
+
+        // 渲染選單與食譜內文
+        function renderInterface(data) {
+            const menuGrid = document.getElementById('menuGrid');
+            const recipeContainer = document.getElementById('recipeContainer');
+            
+            menuGrid.innerHTML = '';
+            recipeContainer.innerHTML = '';
+
+            if (data.length === 0) {
+                menuGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--muted-color); text-align:center;">沒有找到符合的食譜</p>';
+                return;
+            }
+
+            data.forEach(recipe => {
+                // 1. 渲染快速跳轉目錄
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.innerText = recipe.title;
+                menuItem.onclick = () => {
+                    const target = document.getElementById(recipe.id);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                };
+                menuGrid.appendChild(menuItem);
+
+                // 2. 渲染詳細食譜卡片
+                const card = document.createElement('article');
+                card.className = 'recipe-card';
+                card.id = recipe.id;
+
+                let ingredientsHTML = '';
+                recipe.ingredients.forEach(ing => {
+                    ingredientsHTML += `<li>${ing}</li>`;
+                });
+
+                let stepsHTML = '';
+                recipe.steps.forEach(step => {
+                    stepsHTML += `<li>${step}</li>`;
+                });
+
+                card.innerHTML = `
+                    <span class="category-tag">${recipe.category}</span>
+                    <h2>\\\\ ${recipe.title} //</h2>
+                    ${recipe.desc ? `<p class="description">${recipe.desc}</p>` : ''}
+                    <div class="recipe-meta">
+                        <h3>【材料】</h3>
+                        <ul>${ingredientsHTML}</ul>
+                    </div>
+                    <div class="recipe-steps">
+                        <h3>【做法】</h3>
+                        <ol>${stepsHTML}</ol>
+                    </div>
+                `;
+                recipeContainer.appendChild(card);
+            });
+        }
+
+        // 大類分類篩選功能
+        let currentCategory = 'ALL';
+        function filterCategory(category, buttonElement) {
+            currentCategory = category;
+            
+            // 切換按鈕 active 樣式
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+
+            executeSearchAndFilter();
+        }
+
+        // 執行 搜尋 + 分類 雙重邏輯過濾
+        function executeSearchAndFilter() {
+            const keyword = document.getElementById('searchBox').value.trim().toLowerCase();
+            
+            const filtered = recipes.filter(recipe => {
+                const matchCategory = (currentCategory === 'ALL' || recipe.category === currentCategory);
+                const matchKeyword = !keyword || 
+                                     recipe.title.toLowerCase().includes(keyword) || 
+                                     (recipe.desc && recipe.desc.toLowerCase().includes(keyword)) ||
+                                     recipe.ingredients.some(i => i.toLowerCase().includes(keyword));
+                return matchCategory && matchKeyword;
+            });
+
+            renderInterface(filtered);
+        }
+
+        // 監聽搜尋框輸入事件
+        document.getElementById('searchBox').addEventListener('input', executeSearchAndFilter);
+
+        // 初始化第一次渲染
+        renderInterface(recipes);
+    </script>
+</body>
+</html>
